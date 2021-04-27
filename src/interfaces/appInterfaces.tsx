@@ -5,6 +5,12 @@ export interface LoginData {
   password: string;
 }
 
+export interface RegisterData {
+  nombre: string;
+  correo: string;
+  password: string;
+}
+
 export interface LoginResponse {
   usuario: Usuario;
   token:   string;

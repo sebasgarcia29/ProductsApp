@@ -23,15 +23,11 @@ interface Props extends StackScreenProps<any, any> { }
 export const LoginScreen = ({ navigation }: Props) => {
 
   const initialState = {
-    email: 'test1@test.com',
-    password: '123456',
+    email: '', //test1@test.com
+    password: '', //123456
   };
 
-
   const { signIn, errorMessage, removeError } = useContext(AuthContext);
-
-  console.log({ errorMessage });
-
   const { email, password, onChange } = useForm(initialState);
 
   useEffect(() => {

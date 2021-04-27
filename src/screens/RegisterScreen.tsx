@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,12 +9,14 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
+  Alert,
 } from 'react-native';
 import { WhiteLogo } from '../components/WhiteLogo';
 import { loginStyles } from '../theme/loginTheme';
 import { useForm } from '../hooks/useForm';
 import { StackScreenProps } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { AuthContext } from '../context/AuthContext';
 
 interface Props extends StackScreenProps<any, any> { }
 
@@ -27,10 +30,20 @@ export const RegisterScreen = ({ navigation }: Props) => {
 
   const { email, password, name, onChange } = useForm(intitalState);
 
+  const { signUp, errorMessage, removeError } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (errorMessage.length === 0) { return; }
+    Alert.alert(
+      'Error de registro', errorMessage, [{
+        text: 'Ok',
+        onPress: () => removeError(),
+      }]);
+  }, [errorMessage]);
+
   const onRegister = () => {
-    console.log({ name, email, password });
+    signUp({ nombre: name, correo: email, password });
     Keyboard.dismiss();
-    navigation.navigate('ProtectedScreen');
   };
 
   return (
