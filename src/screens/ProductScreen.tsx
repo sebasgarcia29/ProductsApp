@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -7,7 +8,7 @@ import {
   View,
   ScrollView,
   TextInput,
-  Image,
+  Alert,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -17,6 +18,8 @@ import { ProductsStackParams } from '../navigation/ProductsNavigator';
 import { useCategories } from '../hooks/useCategories';
 import { useForm } from '../hooks/useForm';
 import { ProductContext } from '../context/ProductContext';
+import { WaveIndicator } from 'react-native-indicators';
+import { FadeInImage } from '../components/FadeInImage';
 
 interface Props extends StackScreenProps<ProductsStackParams, 'ProductScreen'> { }
 
@@ -26,7 +29,10 @@ export const ProductScreen = ({ route, navigation }: Props) => {
 
   const { name = '', id = '' } = route.params;
 
-  const { loadProductById, addProduct, updateProduct, uploadImage } = useContext(ProductContext);
+  const {
+    loadProductById, addProduct, updateProduct, uploadImage, loadingImage,
+    deleteProduct,
+  } = useContext(ProductContext);
 
   const [tempUri, setTempUri] = useState<string>();
 
@@ -97,9 +103,24 @@ export const ProductScreen = ({ route, navigation }: Props) => {
     });
   };
 
+  const onPressDelete = () => {
+    Alert.alert('Borrar producto', '¿Esta seguro de borrar el producto?',
+      [
+        { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        { text: 'OK', onPress: () => deleteProduct(_id) },
+      ]
+    );
+  };
+
 
   return (
     <View style={styles.container}>
+
+      {loadingImage && (
+        <View style={{ position: 'absolute', zIndex: 999, top: 150, left: 70 }}>
+          <WaveIndicator size={200} color={'#f4d580'} />
+        </View>
+      )}
       <ScrollView>
         <Text style={styles.label}>
           {name}
@@ -157,12 +178,20 @@ export const ProductScreen = ({ route, navigation }: Props) => {
               <Icon name={'photo-video'} size={30} color={'#f84e1e'} />
               <Text> Galeria </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.4}
+              style={styles.addButton}
+              onPress={onPressDelete}
+            >
+              <Icon name={'trash-alt'} size={30} color={'#f84e1e'} />
+              <Text> Eliminar </Text>
+            </TouchableOpacity>
           </View>
         )}
 
         {img.length > 0 && !tempUri && (
-          <Image
-            source={{ uri: img }}
+          <FadeInImage
+            uri={img}
             style={styles.productImage}
           />
         )}
@@ -170,8 +199,8 @@ export const ProductScreen = ({ route, navigation }: Props) => {
         {/* Mostar imagen temporal */}
 
         {tempUri && (
-          <Image
-            source={{ uri: tempUri }}
+          <FadeInImage
+            uri={tempUri}
             style={styles.productImage}
           />
         )}

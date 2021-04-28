@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { createContext, useEffect, useState } from 'react';
 import { Producto, ProductsResponse } from '../interfaces/productsInterface';
 import productApi from '../clientProductsApp/ProductApi';
@@ -55,7 +54,12 @@ export const ProductProvider = ({ children }: any) => {
   };
 
   const deleteProduct = async (productId: string) => {
-
+    try {
+      const resp = await productApi.delete(`/api/productos/${productId}`);
+      setProducts(products.map(prod => (prod._id === productId) ? resp.data : prod));
+    } catch (error) {
+      console.log({ error });
+    }
   };
   const loadProductById = async (id: string): Promise<Producto> => {
     const resp = await productApi.get<Producto>(`api/productos/${id}`);
