@@ -8,7 +8,7 @@ import { PacmanIndicator } from 'react-native-indicators';
 export const LoadingScreen = () => {
   return (
     <View style={styles.container}>
-      <PacmanIndicator size={200} color={'#f84e1e'} />
+      <PacmanIndicator size={200} color={'#f4d580'} />
     </View>
   );
 };

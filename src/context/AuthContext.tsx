@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useReducer } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import productApi from '../clientProductsApp/ProductApi';
 import { Usuario, LoginResponse, LoginData, RegisterData } from '../interfaces/appInterfaces';
-import { authReducer, AuthState } from './authReducer';
+import { authReducer, AuthState } from '../reducers/authReducer';
 
 type AuthContextProps = {
   errorMessage: string;
