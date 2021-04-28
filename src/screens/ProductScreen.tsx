@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 import {
   StyleSheet,
@@ -12,6 +12,7 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Picker } from '@react-native-picker/picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { ProductsStackParams } from '../navigation/ProductsNavigator';
 import { useCategories } from '../hooks/useCategories';
 import { useForm } from '../hooks/useForm';
@@ -25,7 +26,9 @@ export const ProductScreen = ({ route, navigation }: Props) => {
 
   const { name = '', id = '' } = route.params;
 
-  const { loadProductById, addProduct, updateProduct } = useContext(ProductContext);
+  const { loadProductById, addProduct, updateProduct, uploadImage } = useContext(ProductContext);
+
+  const [tempUri, setTempUri] = useState<string>();
 
   const initState = {
     _id: id,
@@ -69,6 +72,31 @@ export const ProductScreen = ({ route, navigation }: Props) => {
       onChange(newProduct._id, '_id');
     }
   };
+
+  const takePhoto = () => {
+    launchCamera({
+      mediaType: 'photo',
+      quality: 0.7,
+    }, (resp) => {
+      if (resp.didCancel) { return; }
+      if (!resp.uri) { return; }
+      setTempUri(resp.uri);
+      uploadImage(resp, _id);
+    });
+  };
+
+  const takePhotoFromGalery = () => {
+    launchImageLibrary({
+      mediaType: 'photo',
+      quality: 0.7,
+    }, (resp) => {
+      if (resp.didCancel) { return; }
+      if (!resp.uri) { return; }
+      setTempUri(resp.uri);
+      uploadImage(resp, _id);
+    });
+  };
+
 
   return (
     <View style={styles.container}>
@@ -116,7 +144,7 @@ export const ProductScreen = ({ route, navigation }: Props) => {
             <TouchableOpacity
               activeOpacity={0.4}
               style={styles.addButton}
-              onPress={() => console.log('camera')}
+              onPress={takePhoto}
             >
               <Icon name={'camera-retro'} size={30} color={'#2c9d71'} />
               <Text> Camera </Text>
@@ -124,7 +152,7 @@ export const ProductScreen = ({ route, navigation }: Props) => {
             <TouchableOpacity
               activeOpacity={0.4}
               style={styles.addButton}
-              onPress={() => console.log('galeria')}
+              onPress={takePhotoFromGalery}
             >
               <Icon name={'photo-video'} size={30} color={'#f84e1e'} />
               <Text> Galeria </Text>
@@ -132,7 +160,7 @@ export const ProductScreen = ({ route, navigation }: Props) => {
           </View>
         )}
 
-        {img.length > 0 && (
+        {img.length > 0 && !tempUri && (
           <Image
             source={{ uri: img }}
             style={styles.productImage}
@@ -140,6 +168,13 @@ export const ProductScreen = ({ route, navigation }: Props) => {
         )}
 
         {/* Mostar imagen temporal */}
+
+        {tempUri && (
+          <Image
+            source={{ uri: tempUri }}
+            style={styles.productImage}
+          />
+        )}
 
 
 
